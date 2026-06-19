@@ -1,7 +1,6 @@
 # minecamp-game
+#### - Status: Fazendo... 
 Jogo de campo minado feito exclusivamente em c++. 
-
-**Status:** Fazendo... 
 
 ### Qual é o  objetivo desse projeto?
 
