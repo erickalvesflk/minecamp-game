@@ -8,13 +8,17 @@
 
 #include <iostream>
 #include <cstdlib>
-
+#include "minecamp.hpp"
 
 using namespace std;
 
 class MenuClass 
 {
     public:
+
+        bool running = true;
+        bool playing = false;
+
         string title[7] = {
             R"(    __  ____                                      )",
             R"(   /  |/  (_)___  ___  _________ _____ ___  ____  )",
@@ -34,14 +38,11 @@ class MenuClass
         }
 };
 
-
 int main()
 {
-    bool running = true;
-
     MenuClass menu;
     
-    while(running)
+    while(menu.running)
     {   
         system("cls");
         string answer = "";
@@ -50,15 +51,33 @@ int main()
         cout << "- Hello! Inform the desire size (lxl) for the minecamp or write 'l' to leave: ";
         cin >> answer;
 
-        if (answer[0] == 'l'){
+        if (answer[0] == 'l')
+        {
             cout << "\n- The minecamp was finalized! " << endl;
             break;
         }
 
-        unsigned int size {};
+        size_t size {};
         try
         {
             size = stoi(answer);
+            menu.playing = true;
+
+            Minecamp minecamp(size,10);
+            string command = "s";
+
+            while (menu.playing)
+            {
+                system("cls");
+                menu.show_title();
+
+                minecamp.show_minecamp();
+                cout << "- comando: ";
+                cin >> command;
+
+                if (command[0] == 'l') menu.playing = false;
+
+            }
         }
         catch (exception e)
         {
@@ -67,10 +86,6 @@ int main()
             getchar();
             continue;
         }
-
-        
-
     }
-
     return 0;
 }
