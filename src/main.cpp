@@ -36,6 +36,13 @@ class MenuClass
                 cout << title[i] << endl;
             }
         }
+
+        void invalid_input()
+        {
+            cout << "- Inform a valid number or 'l' " << endl;
+            getchar();
+            getchar();                           
+        }
 };
 
 int main()
@@ -64,7 +71,8 @@ int main()
             menu.playing = true;
 
             Minecamp minecamp(size,10);
-            string command = "s";
+            string command = "";
+            int cod[2] = {0,0};
 
             while (menu.playing)
             {
@@ -72,18 +80,54 @@ int main()
                 menu.show_title();
 
                 minecamp.show_minecamp();
+                // minecamp.xray_minecamp();
                 cout << "- comando: ";
                 cin >> command;
 
-                if (command[0] == 'l') menu.playing = false;
+                if (command[0] == 'l'){ menu.playing = false; break;}
+                
+                int x = 0, y = 0;
+                bool in_x = true;
+                    
+                if(command[0] == 'f' or command[0] == 's')
+                {
+                    try
+                    {
+                        std::cout << "- Informe x: ";
+                        std::cin >> x;
+                        std::cout << "- Informe y: ";
+                        std::cin >> y;
+                    }
+                    catch(const std::exception& e)
+                    {
+                        cout << "- Inform a valid number or 'l' " << endl;
+                        getchar();
+                        getchar(); 
+                    }
+                    pos position;
+                    if(x < 0 and y < 0 and x > size and y > size) {menu.invalid_input(); continue;}
+                    position.x = x - 1;
+                    position.y = y - 1;
+                    if(command[0] == 'f')
+                    {  
+                        minecamp.flag(position);
+                    }
+                    else
+                    {
+                        minecamp.step(position);
+                    }
+                }
+                else
+                {
+                    menu.invalid_input();
+                    continue;
+                }              
 
             }
         }
         catch (exception e)
         {
-            cout << "- Inform a valid number or 'l' " << endl;
-            getchar();
-            getchar();
+            menu.invalid_input();
             continue;
         }
     }
