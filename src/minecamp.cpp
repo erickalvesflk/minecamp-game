@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <random>
 #include "minecamp.hpp"
 
 Minecamp::Minecamp(size_t size, unsigned int mine_quant)
@@ -7,6 +8,9 @@ Minecamp::Minecamp(size_t size, unsigned int mine_quant)
     this->size = size;
     this->mine_quant = mine_quant;
     this->total_flags = mine_quant;
+
+    std::uniform_int_distribution<int> dm(0,size-1);
+    this->dist_mines = dm;
 
     mine_pos.resize(mine_quant);
     camp.resize(size);
@@ -70,8 +74,8 @@ void Minecamp::generate_camp()
     int find_mine_try = 0;
     for(size_t mine_index = 0; mine_index < mine_quant; ++mine_index)
     {
-        int x = rand()%size;
-        int y = rand()%size;
+        int x = dist_mines(random_int_generator);
+        int y = dist_mines(random_int_generator);
 
         const squareInCamp& possible_mine = camp[y][x];
 
@@ -99,7 +103,6 @@ void Minecamp::generate_camp()
         find_mine_try = 0; // Reseta o contador de tentativas de encontrar uma mina (contador para impedir um loop infinito)
         
     }
-
     // Update mine's neighboors
     for(pos mine : mine_pos)
     {
@@ -107,21 +110,50 @@ void Minecamp::generate_camp()
         for(pos neighboor_pos : neighboors_pos)
         {
             squareInCamp& neighboor = camp[neighboor_pos.y][neighboor_pos.x];
-
+            
             if(neighboor.value == Elements::Mine) continue;
             camp[neighboor_pos.y][neighboor_pos.x].value += 1;          
         }
     }
+    
+    pos a = find_safe_pos();
+    step(a); // Gera um local seguro para iniciar.
 }
 
 // VIZUALIZAÇÃO
-void Minecamp::show_minecamp()
-{
-    for(size_t y = 0; y < size; ++y)
+
+void Minecamp::build_minecamp(std::string value_type)
+{   
+    
+    std::cout<< "     |"; // build x axis
+    for(size_t x = 0; x < size; ++x)
     {
-        for(size_t x = 0; x < size; ++x)
+        std::string str_cod = std::to_string(x + 1);
+        std::cout << str_cod.insert(0,3 - str_cod.length(), ' ') << " |";
+    }
+    std::cout<< std::endl;
+    std::cout<< "-----  "; // build decotarion for x axis
+    for(size_t x = 0; x < size; ++x)
+    {
+        std::cout << " :   ";
+    }
+    std::cout<< std::endl;
+
+    for(size_t y = 0; y < size; ++y){
+
+        std::string str_cod = std::to_string(y + 1); // build y axis
+        std::cout << str_cod.insert(0,5 - str_cod.length(), ' ') << " - ";
+
+        for(size_t x = 0; x < size; ++x) // Build Squares
         {    
-            std::cout << camp[y][x].get_value() << " ";
+            char value = value_type == "xray" ? camp[y][x].value : camp[y][x].get_value();
+            std::cout << value << "    ";
+        }
+        std::cout<< std::endl;
+        std::cout << "-----";
+        for(size_t x = 0; x < size; ++x) // Build Line
+        {    
+            std::cout << "     ";
         }
         if (size/(y+1) == 2 and (not saw_info)) // Meio
         {
@@ -131,16 +163,14 @@ void Minecamp::show_minecamp()
         std::cout << std::endl;
     }
 }
+
+void Minecamp::show_minecamp()
+{   
+    build_minecamp("show");
+}
 void Minecamp::xray_minecamp()
 {
-    for(size_t y = 0; y < size; ++y)
-    {
-        for(size_t x = 0; x < size; ++x)
-        {    
-            std::cout << camp[y][x].value << " ";
-        }
-        std::cout << std::endl;
-    }
+    build_minecamp("xray");
 }
 
 int Minecamp::get_size()
@@ -187,7 +217,7 @@ void Minecamp::recursive_safe(pos position){
 
     for(pos neighboor_pos : neighboors){
         squareInCamp& neighboor = camp[neighboor_pos.y][neighboor_pos.x];
-        if(neighboor.value == '0' and neighboor.hidden)
+        if((neighboor.value == Elements::Safe or neighboor.value == '1') and neighboor.hidden)
         {   
             neighboor.hidden = false;
             recursive_safe(neighboor_pos);
@@ -203,10 +233,32 @@ char Minecamp::step(pos position)
     square.hidden = false;
     if(square.value == Elements::Mine) return 'M';
 
-    if(square.value == '0')
+    if(square.value == Elements::Safe)
     {
         recursive_safe(position);
     }
 
     return '0';
+}
+
+pos Minecamp::find_safe_pos()
+{
+
+    std::vector<pos> candidates;
+    for(size_t x = 0; x < size; ++x){
+        for(size_t y = 0; y < size; ++y)
+        {
+            if (camp[y][x].value == Elements::Safe)
+            {
+                candidates.push_back(pos::new_pos(x,y));
+            }
+        }
+    }
+
+    std::uniform_int_distribution<int> choice_dist(0,candidates.size()-1);
+    int index_choiced = choice_dist(random_int_generator);
+
+    std::cout << "Chegou aqui!" << std::endl;
+    
+    return candidates[index_choiced];
 }

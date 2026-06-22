@@ -1,9 +1,11 @@
 #include <iostream>
 #include <vector>
+#include <random>
 
 enum Elements : char {
     Flag = 'F',
-    Mine = 'M'
+    Mine = 'M',
+    Safe = '0'
 };
 
 struct squareInCamp
@@ -21,13 +23,20 @@ struct squareInCamp
         {
             return value;
         }
-    };
+    }
 };
 
 struct pos
 {
     int x = 0;
     int y = 0;
+    static pos new_pos(unsigned int x,unsigned int y)
+    {   
+        pos result {};
+        result.x = x;
+        result.y = y;
+        return result;
+    }
 };
 
 class Minecamp {   
@@ -41,13 +50,18 @@ class Minecamp {
         std::vector<std::vector<squareInCamp>> camp;
         std::vector<pos> mine_pos;
         std::vector<pos> player_guesses;
+
+        std::default_random_engine random_int_generator;
+        std::uniform_int_distribution<int> dist_mines;
         
         void generate_camp();
         void recursive_safe(pos position);
         bool check_guesses();
-    
-    public:
+        pos find_safe_pos();
+        
+        public:
         Minecamp(size_t size, unsigned int mine_quant);
+        void build_minecamp(std::string value);
         void show_minecamp();
         void xray_minecamp();
         int get_size();

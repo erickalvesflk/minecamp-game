@@ -45,6 +45,82 @@ class MenuClass
         }
 };
 
+void game(MenuClass& menu, string& answer)
+{
+    int size = stoi(answer);
+    menu.playing = true;
+
+    Minecamp minecamp(size,size*size * .3);
+    string command = "";
+
+    while (menu.playing)
+    {
+        system("cls");
+        menu.show_title();
+
+        minecamp.show_minecamp();
+        // minecamp.xray_minecamp();
+        cout << "- Inform the desire action. Which 'f' for flag, 's' for step or 'l' for leave" << endl;
+        cout << "- Comand: ";
+        cin >> command;
+
+        if (command[0] == 'l'){ menu.playing = false; break;}
+        
+        string str_x = {}, str_y = {};
+        int x = 0, y = 0;
+        bool in_x = true;
+            
+        if(command[0] == 'f' or command[0] == 's')
+        {
+            cout << "- You can cancel informing 'c' " << endl;
+            try
+            {
+                cout << "-  Inform x: ";
+                cin >> str_x;
+                if(str_x == "c")continue;
+                cout << "-  Inform y: ";
+                cin >> str_y;
+                if(str_y == "c") continue;
+
+                x = stoi(str_x);
+                y = stoi(str_y);
+
+                if((x - 1 < 0) or (y - 1 < 0) or (x  - 1 > size) or (y  - 1 > size - 1)) {
+                    menu.invalid_input(); 
+                    continue;
+                }
+            }
+            catch(const exception& e)
+            {
+                menu.invalid_input();
+                continue;
+            }
+
+            pos position;
+            position.x = x - 1;
+            position.y = y - 1;
+            cout << "Input pos (" << x << ", " << y << ")" << endl;
+            cout << "Real pos (" << position.x << ", " << position.y << ")" << endl;
+            cout << "Verify:  (" << ((x - 1 < 0) or (y - 1 < 0) or (x  - 1 > size) or (y  - 1 > size - 1)) << endl;
+            getchar();
+            getchar();
+            if(command[0] == 'f')
+            {  
+                minecamp.flag(position);
+            }
+            else
+            {
+                minecamp.step(position);
+            }
+        }
+        else
+        {
+            menu.invalid_input();
+            continue;
+        }              
+    }
+}
+
 int main()
 {
     MenuClass menu;
@@ -63,67 +139,9 @@ int main()
             cout << "\n- The minecamp was finalized! " << endl;
             break;
         }
-
-        size_t size {};
         try
         {
-            size = stoi(answer);
-            menu.playing = true;
-
-            Minecamp minecamp(size,10);
-            string command = "";
-            int cod[2] = {0,0};
-
-            while (menu.playing)
-            {
-                system("cls");
-                menu.show_title();
-
-                minecamp.show_minecamp();
-                // minecamp.xray_minecamp();
-                cout << "- comando: ";
-                cin >> command;
-
-                if (command[0] == 'l'){ menu.playing = false; break;}
-                
-                int x = 0, y = 0;
-                bool in_x = true;
-                    
-                if(command[0] == 'f' or command[0] == 's')
-                {
-                    try
-                    {
-                        std::cout << "- Informe x: ";
-                        std::cin >> x;
-                        std::cout << "- Informe y: ";
-                        std::cin >> y;
-                    }
-                    catch(const std::exception& e)
-                    {
-                        cout << "- Inform a valid number or 'l' " << endl;
-                        getchar();
-                        getchar(); 
-                    }
-                    pos position;
-                    if(x < 0 and y < 0 and x > size and y > size) {menu.invalid_input(); continue;}
-                    position.x = x - 1;
-                    position.y = y - 1;
-                    if(command[0] == 'f')
-                    {  
-                        minecamp.flag(position);
-                    }
-                    else
-                    {
-                        minecamp.step(position);
-                    }
-                }
-                else
-                {
-                    menu.invalid_input();
-                    continue;
-                }              
-
-            }
+            game(menu, answer);
         }
         catch (exception e)
         {
