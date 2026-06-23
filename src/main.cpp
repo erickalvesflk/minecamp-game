@@ -96,9 +96,7 @@ void game(MenuClass& menu, string& answer)
                 continue;
             }
 
-            pos position;
-            position.x = x - 1;
-            position.y = y - 1;
+            pos position = pos::new_pos(x - 1,y - 1);
 
             if(command[0] == 'f')
             {  

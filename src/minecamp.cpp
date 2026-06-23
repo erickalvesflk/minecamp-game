@@ -29,32 +29,15 @@ Minecamp::Minecamp(size_t size, unsigned int mine_quant)
 
 std::vector<pos> Minecamp::get_neighboors(pos position)
 {
-    pos neighboors[8] {};
-        // UP
-        neighboors[0].x = position.x;
-        neighboors[0].y = position.y + 1;
-        // DOWN
-        neighboors[1].x = position.x;
-        neighboors[1].y = position.y - 1;
-        // LEFT
-        neighboors[2].x = position.x - 1;
-        neighboors[2].y = position.y;
-        // RIGHT
-        neighboors[3].x = position.x + 1;
-        neighboors[3].y = position.y;
-        // UP-LEFT
-        neighboors[4].x = position.x - 1;
-        neighboors[4].y = position.y + 1;
-        // UP-RIGHT
-        neighboors[5].x = position.x + 1;
-        neighboors[5].y = position.y + 1;
-        // DOWN-LEFT
-        neighboors[6].x = position.x - 1;
-        neighboors[6].y = position.y - 1;
-        // DOWN-RIGHT
-        neighboors[7].x = position.x + 1;
-        neighboors[7].y = position.y - 1;
-
+    std::vector<pos> neighboors {};
+    
+        for(int y_pos = -1; y_pos <= 1; ++y_pos){
+            for(int x_pos = -1; x_pos <= 1; ++x_pos)
+            {   
+                if(y_pos == 0 and x_pos == 0) continue;
+                neighboors.push_back(pos::new_pos(position.x+x_pos,position.y+y_pos));
+            }    
+        }
 
     std::vector<pos> result = {};
     for (pos neighboor_pos : neighboors)
@@ -96,8 +79,7 @@ void Minecamp::generate_camp()
         }
         
         // std::cout << x << " e " << y << " : escolhidos!" << std::endl;
-        mine_pos[mine_index].x = x;
-        mine_pos[mine_index].y = y;
+        mine_pos[mine_index] = pos::new_pos(x,y);
         camp[y][x].value = Elements::Mine;
 
         find_mine_try = 0; // Reseta o contador de tentativas de encontrar uma mina (contador para impedir um loop infinito)
@@ -107,8 +89,10 @@ void Minecamp::generate_camp()
     for(pos mine : mine_pos)
     {
         std::vector<pos> neighboors_pos = get_neighboors(mine);
+        std::cout <<"x: "<< mine.x << " y: " << mine.y << std::endl;
         for(pos neighboor_pos : neighboors_pos)
         {
+            std::cout <<"x: "<< neighboor_pos.x << " y: " << neighboor_pos.y << std::endl;
             squareInCamp& neighboor = camp[neighboor_pos.y][neighboor_pos.x];
             
             if(neighboor.value == Elements::Mine) continue;
@@ -116,8 +100,7 @@ void Minecamp::generate_camp()
         }
     }
     
-    pos a = find_safe_pos();
-    step(a); // Gera um local seguro para iniciar.
+    step(find_safe_pos()); // Gera um local seguro para iniciar.
 }
 
 // VIZUALIZAÇÃO
