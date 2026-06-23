@@ -72,7 +72,7 @@ void game(MenuClass& menu, string& answer)
             
         if(command[0] == 'f' or command[0] == 's')
         {
-            cout << "- You can cancel informing 'c' " << endl;
+            cout << "Action: " << command[0] << " - You can cancel informing 'c' " << endl;
             try
             {
                 cout << "-  Inform x: ";

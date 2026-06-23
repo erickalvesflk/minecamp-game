@@ -51,7 +51,7 @@ class Minecamp {
         std::vector<pos> mine_pos;
         std::vector<pos> player_guesses;
 
-        std::default_random_engine random_int_generator;
+        std::default_random_engine random_int_generator{std::random_device{}()};
         std::uniform_int_distribution<int> dist_mines;
         
         void generate_camp();
