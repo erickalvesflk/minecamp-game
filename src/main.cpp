@@ -99,18 +99,34 @@ void game(MenuClass& menu, string& answer)
             pos position;
             position.x = x - 1;
             position.y = y - 1;
-            cout << "Input pos (" << x << ", " << y << ")" << endl;
-            cout << "Real pos (" << position.x << ", " << position.y << ")" << endl;
-            cout << "Verify:  (" << ((x - 1 < 0) or (y - 1 < 0) or (x  - 1 > size) or (y  - 1 > size - 1)) << endl;
-            getchar();
-            getchar();
+
             if(command[0] == 'f')
             {  
-                minecamp.flag(position);
+                bool won = minecamp.flag(position);
+                if(won)
+                {
+                    system("cls");
+                    menu.show_title();
+                    minecamp.show_minecamp();
+                    cout << "\n                   YOU WIN!" << endl;
+                    getchar();
+                    getchar();
+                    break;                    
+                }
             }
             else
             {
-                minecamp.step(position);
+                squareInCamp result = minecamp.step(position);
+                if(result.value == Elements::Mine and (not result.flaged))
+                {
+                    system("cls");
+                    menu.show_title();
+                    minecamp.show_minecamp();
+                    cout << "\n                   KABOOM!" << endl;
+                    getchar();
+                    getchar();
+                    break;
+                }
             }
         }
         else

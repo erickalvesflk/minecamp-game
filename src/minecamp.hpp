@@ -67,6 +67,6 @@ class Minecamp {
         int get_size();
         int get_flag_quant();
         std::vector<pos> get_neighboors(pos position);
-        char step(pos position);
-        void flag(pos position);
+        squareInCamp step(pos position);
+        bool flag(pos position);
 };

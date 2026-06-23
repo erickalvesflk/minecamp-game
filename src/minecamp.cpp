@@ -195,7 +195,7 @@ bool Minecamp::check_guesses(){
 
 // AÇÕES
 
-void Minecamp::flag(pos position)
+bool Minecamp::flag(pos position)
 {
     squareInCamp& square = camp[position.y][position.x];
     if(square.flaged)
@@ -210,6 +210,8 @@ void Minecamp::flag(pos position)
             square.flaged = true;
         }
     }
+
+    return check_guesses();
 }
 
 void Minecamp::recursive_safe(pos position){
@@ -225,20 +227,19 @@ void Minecamp::recursive_safe(pos position){
     }
 }
 
-char Minecamp::step(pos position)
-{
+squareInCamp Minecamp::step(pos position)
+{   
     squareInCamp& square = camp[position.y][position.x];
-    if(square.value == Elements::Flag) return 'F';
-
-    square.hidden = false;
-    if(square.value == Elements::Mine) return 'M';
-
-    if(square.value == Elements::Safe)
+    if(square.hidden)
     {
-        recursive_safe(position);
+        square.hidden = false;
+    
+        if(square.value == Elements::Safe)
+        {
+            recursive_safe(position);
+        }
     }
-
-    return '0';
+    return square;
 }
 
 pos Minecamp::find_safe_pos()
